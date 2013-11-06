@@ -18,7 +18,7 @@ def test_conjugate_grad_descent():
   im_blur=a8.convolve3(im, kernel)
 
   io.imwrite(im_blur, 'pru_blur.png')
-  im_sharp=a8.deconvCG(im_blur, kernel, 25);
+  im_sharp=a8.deconvCG(im_blur, kernel);
   io.imwrite(im_sharp, 'pru_sharp_CG.png')
   print
 
@@ -46,7 +46,7 @@ def test_conjugate_grad_descent_reg():
   im_blur_noisy=im_blur+0.05*noise
 
   io.imwrite(im_blur_noisy, 'pru_blur_noise.png')
-  im_sharp=a8.deconvCG_reg(im_blur_noisy, kernel, 20);
+  im_sharp=a8.deconvCG_reg(im_blur_noisy, kernel);
   im_sharp_wo_reg=a8.deconvCG(im_blur_noisy, kernel);
   io.imwrite(im_sharp, 'pru_sharp_CG_reg.png')
   io.imwrite(im_sharp_wo_reg, 'pru_sharp_CG_wo_reg.png')
@@ -126,10 +126,10 @@ def test_PoissonCG():
 
 
 # test_grad_descent()
-test_conjugate_grad_descent()
-test_real_psf()
-test_conjugate_grad_descent_reg()
+# test_conjugate_grad_descent()
+# test_real_psf()
+# test_conjugate_grad_descent_reg()
 # test_naive_composite()
 # test_Poisson()
-# test_PoissonCG()
+test_PoissonCG()
 

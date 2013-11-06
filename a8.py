@@ -47,7 +47,6 @@ def deconvCG(im_blur, kernel, niter=10):
     r1 = r0 - alpha * applyAMatrix(d, kernel)
     d = r1 + computeConjugateDirectionStepSize(r0, r1) * d
     r0 = r1.copy()
-    print dotIm(im_blur - applyKernel(im, kernel), im_blur - applyKernel(im, kernel))
 
   return im
 
@@ -81,7 +80,6 @@ def deconvCG_reg(im_blur, kernel, lamb=0.05, niter=10):
     r1 = r0 - alpha * applyRegularizedOperator(d, kernel, lamb)
     d = r1 + computeConjugateDirectionStepSize(r0, r1) * d
     r0 = r1.copy()
-    print dotIm(im_blur - applyKernel(im, kernel), im_blur - applyKernel(im, kernel))
   return im
 
 def naiveComposite(bg, fg, mask, y, x):
@@ -91,14 +89,29 @@ def naiveComposite(bg, fg, mask, y, x):
   out[y:y+height, x:x+width] = np.where(mask, fg*mask, bg[y:y+height, x:x+width])
   return out
 
-def Poisson(bg, fg, mask, niter=200):
+def Poisson(bg, fg, mask, niter=3000):
   ''' Poisson editing using gradient descent'''
+  b = applyLaplacian(fg)
+  x = np.where(mask, 0.0, bg)
+  for n in xrange(niter):
+    r = (b - applyLaplacian(x)) * mask
+    alpha = dotIm(r, r) / dotIm(r, applyLaplacian(r))
+    x += alpha * r
   return x
 
-def PoissonCG(bg, fg, mask, niter=200):
+def PoissonCG(bg, fg, mask, niter=100):
   ''' Poison editing using conjugate gradient '''
+  b = applyLaplacian(fg)
+  x = np.where(mask, 0.0, bg)
+  r0 = (b - applyLaplacian(x)) * mask
+  d = r0.copy()
+  for n in xrange(niter):
+    alpha = dotIm(r0, r0) / dotIm(d, applyLaplacian(d))
+    x += alpha * d
+    r1 = (r0 - alpha * applyLaplacian(d)) * mask
+    d = r1 + computeConjugateDirectionStepSize(r0, r1) * d
+    r0 = r1.copy()
   return x
-
 
 
 #==== Helpers. Use them as possible. ====
