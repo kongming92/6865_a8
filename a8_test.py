@@ -113,13 +113,11 @@ def test_PoissonCG():
 
   io.imwrite(out, 'poisson_CG.png')
 
-
-
-# test_grad_descent()
-# test_conjugate_grad_descent()
-# test_real_psf()
-# test_conjugate_grad_descent_reg()
-# test_naive_composite()
+test_grad_descent()
+test_conjugate_grad_descent()
+test_real_psf()
+test_conjugate_grad_descent_reg()
+test_naive_composite()
 test_Poisson()
-# test_PoissonCG()
+test_PoissonCG()
 
