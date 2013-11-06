@@ -12,7 +12,6 @@ def test_grad_descent():
   io.imwrite(im_sharp, 'pru_sharp.png')
 
 def test_conjugate_grad_descent():
-  print "CG"
   im=io.imread('data/pru.png')
   kernel=a8.gauss2D(1)
   im_blur=a8.convolve3(im, kernel)
@@ -20,11 +19,9 @@ def test_conjugate_grad_descent():
   io.imwrite(im_blur, 'pru_blur.png')
   im_sharp=a8.deconvCG(im_blur, kernel);
   io.imwrite(im_sharp, 'pru_sharp_CG.png')
-  print
 
 def test_real_psf():
   im=io.imread('data/pru.png')
-  print "PSF"
   f=open('psf', 'r')
   psf=[map(float, line.split(',')) for line in f ]
   kernel=np.array(psf)
@@ -32,13 +29,10 @@ def test_real_psf():
   #kernel=kernel[::-1, ::-1]
   io.imwrite(im_blur, 'pru_blur_real.png')
   io.imwriteGrey(kernel/np.max(kernel), 'psf.png')
-  im_sharp=a8.deconvCG(im_blur, kernel, 25);
+  im_sharp=a8.deconvCG(im_blur, kernel, 20);
   io.imwrite(im_sharp, 'pru_sharp_CG_real.png')
-  print
-
 
 def test_conjugate_grad_descent_reg():
-  print "reg"
   im=io.imread('data/pru.png')
   kernel=a8.gauss2D(1)
   im_blur=a8.convolve3(im, kernel)
@@ -51,7 +45,6 @@ def test_conjugate_grad_descent_reg():
   io.imwrite(im_sharp, 'pru_sharp_CG_reg.png')
   io.imwrite(im_sharp_wo_reg, 'pru_sharp_CG_wo_reg.png')
 
-
 def test_naive_composite():
   fg=io.imread('data/bear.png')
   bg=io.imread('data/waterpool.png')
@@ -60,7 +53,6 @@ def test_naive_composite():
   io.imwrite(out, 'naive_composite.png')
 
 def test_Poisson():
-
   y=50
   x=10
   useLog=True
@@ -68,7 +60,6 @@ def test_Poisson():
   fg=io.imread('data/bear.png')
   bg=io.imread('data/waterpool.png')
   mask=io.imread('data/mask.png')
-
 
   h, w=fg.shape[0], fg.shape[1]
   mask[mask>0.5]=1.0
@@ -101,7 +92,6 @@ def test_PoissonCG():
   bg=io.imread('data/waterpool.png')
   mask=io.imread('data/mask.png')
 
-
   h, w=fg.shape[0], fg.shape[1]
   mask[mask>0.5]=1.0
   mask[mask<0.6]=0.0
@@ -130,6 +120,6 @@ def test_PoissonCG():
 # test_real_psf()
 # test_conjugate_grad_descent_reg()
 # test_naive_composite()
-# test_Poisson()
-test_PoissonCG()
+test_Poisson()
+# test_PoissonCG()
 

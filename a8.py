@@ -13,9 +13,13 @@ def applyConjugatedKernel(im, kernel):
   ''' return M^T x, where x is im '''
   return convolve3(im, np.fliplr(np.flipud(kernel)));
 
+def applyAMatrix(im, kernel):
+  ''' return Ax, where A = M^TM'''
+  return applyConjugatedKernel(applyKernel(im, kernel), kernel)
+
 def computeResidual(kernel, x, y):
-  ''' return y - Mx '''
-  return y - applyKernel(x, kernel)
+  ''' return MTy - MTMx '''
+  return applyConjugatedKernel(y, kernel) - applyAMatrix(x, kernel)
 
 def computeStepSize(r, kernel):
   return dotIm(r, r) / dotIm(r, applyAMatrix(r, kernel))
@@ -24,8 +28,8 @@ def deconvGradDescent(im_blur, kernel, niter=10):
   ''' return deblurred image '''
   im = np.zeros(im_blur.shape)
   for n in xrange(niter):
-    r_i = applyConjugatedKernel(computeResidual(kernel, im, im_blur), kernel)
-    im += computeStepSize(r_i, kernel) * r_i
+    r = computeResidual(kernel, im, im_blur)
+    im += computeStepSize(r, kernel) * r
   return im
 
 # === Deconvolution with conjugate gradient ===
@@ -39,7 +43,7 @@ def computeConjugateDirectionStepSize(old_r, new_r):
 def deconvCG(im_blur, kernel, niter=10):
   ''' return deblurred image '''
   im = np.zeros(im_blur.shape)
-  r0 = applyConjugatedKernel(computeResidual(kernel, im, im_blur), kernel)
+  r0 = computeResidual(kernel, im, im_blur)
   d = r0.copy()
   for n in xrange(niter):
     alpha = computeGradientStepSize(r0, d, kernel)
@@ -47,7 +51,6 @@ def deconvCG(im_blur, kernel, niter=10):
     r1 = r0 - alpha * applyAMatrix(d, kernel)
     d = r1 + computeConjugateDirectionStepSize(r0, r1) * d
     r0 = r1.copy()
-
   return im
 
 def laplacianKernel():
@@ -57,10 +60,6 @@ def laplacianKernel():
 def applyLaplacian(im):
   ''' return Lx (x is im)'''
   return applyKernel(im, laplacianKernel())
-
-def applyAMatrix(im, kernel):
-  ''' return Ax, where A = M^TM'''
-  return applyConjugatedKernel(applyKernel(im, kernel), kernel)
 
 def applyRegularizedOperator(im, kernel, lamb):
   ''' (A + lambda L )x'''
@@ -99,7 +98,7 @@ def Poisson(bg, fg, mask, niter=3000):
     x += alpha * r
   return x
 
-def PoissonCG(bg, fg, mask, niter=100):
+def PoissonCG(bg, fg, mask, niter=150):
   ''' Poison editing using conjugate gradient '''
   b = applyLaplacian(fg)
   x = np.where(mask, 0.0, bg)
@@ -112,7 +111,6 @@ def PoissonCG(bg, fg, mask, niter=100):
     d = r1 + computeConjugateDirectionStepSize(r0, r1) * d
     r0 = r1.copy()
   return x
-
 
 #==== Helpers. Use them as possible. ====
 
