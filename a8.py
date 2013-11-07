@@ -88,7 +88,7 @@ def naiveComposite(bg, fg, mask, y, x):
   out[y:y+height, x:x+width] = np.where(mask, fg*mask, bg[y:y+height, x:x+width])
   return out
 
-def Poisson(bg, fg, mask, niter=3000):
+def Poisson(bg, fg, mask, niter=200):
   ''' Poisson editing using gradient descent'''
   b = applyLaplacian(fg)
   x = np.where(mask, 0.0, bg)
@@ -98,7 +98,7 @@ def Poisson(bg, fg, mask, niter=3000):
     x += alpha * r
   return x
 
-def PoissonCG(bg, fg, mask, niter=150):
+def PoissonCG(bg, fg, mask, niter=200):
   ''' Poison editing using conjugate gradient '''
   b = applyLaplacian(fg)
   x = np.where(mask, 0.0, bg)

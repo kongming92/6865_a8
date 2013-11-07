@@ -74,7 +74,7 @@ def test_Poisson():
   else:
       bg3=bg2
       fg3=fg
-  tmp=a8.Poisson(bg3, fg3, mask)
+  tmp=a8.Poisson(bg3, fg3, mask, 3000)
 
   if useLog:
       out[y:y+h, x:x+w]=np.exp(tmp-3)
@@ -105,7 +105,7 @@ def test_PoissonCG():
   else:
       bg3=bg2
       fg3=fg
-  tmp=a8.PoissonCG(bg3, fg3, mask)
+  tmp=a8.PoissonCG(bg3, fg3, mask, 150)
 
   if useLog:
       out[y:y+h, x:x+w]=np.exp(tmp-3)
@@ -113,11 +113,44 @@ def test_PoissonCG():
 
   io.imwrite(out, 'poisson_CG.png')
 
-test_grad_descent()
-test_conjugate_grad_descent()
-test_real_psf()
-test_conjugate_grad_descent_reg()
-test_naive_composite()
+def test_myown():
+  y=150
+  x=300
+  useLog=True
+
+  fg=io.imread('dolphin.png')
+  bg=io.imread('bg.png')
+  mask=io.imread('dolphin_mask.png')
+
+  # out=a8.naiveComposite(bg, fg, mask, 50, 50)
+  # io.imwrite(out, 'myownnative11.png')
+
+  h, w=fg.shape[0], fg.shape[1]
+  mask[mask>0.5]=1.0
+  mask[mask<0.6]=0.0
+  bg2=(bg[y:y+h, x:x+w]).copy()
+  out=bg.copy()
+  if useLog:
+      bg2[bg2==0]=1e-4
+      fg[fg==0]=1e-4
+      bg3=np.log(bg2)+3
+      fg3=np.log(fg)+3
+  else:
+      bg3=bg2
+      fg3=fg
+  tmp=a8.PoissonCG(bg3, fg3, mask, 150)
+
+  if useLog:
+      out[y:y+h, x:x+w]=np.exp(tmp-3)
+  else: out[y:y+h, x:x+w]=tmp
+
+  io.imwrite(out, 'myowncomposite.png')
+
+# test_grad_descent()
+# test_conjugate_grad_descent()
+# test_real_psf()
+# test_conjugate_grad_descent_reg()
+# test_naive_composite()
 test_Poisson()
 test_PoissonCG()
-
+# test_myown()
